@@ -233,7 +233,12 @@ def render_panel_3_encoding() -> None:
                 c2.metric("GC content", f"{dna_codec.gc_content(dna):.4f}")
                 c3.metric("Longest HP", f"{hp.get('longest', 0)} nt")
                 c4.metric("HP count ≥2", f"{hp.get('count_ge2', 0):,}")
-                st.text_area("DNA preview", value=dna[:1000], height=DNA_PREVIEW_HEIGHT)
+                st.text_area(
+                    "DNA preview",
+                    value=dna[:1000],
+                    height=DNA_PREVIEW_HEIGHT,
+                    key="dna_preview_text_area",
+                )
                 download_bytes_button("Download binary string", bits.encode("utf-8"), "encoded_bits.txt", "text/plain")
                 download_bytes_button("Download DNA string", dna.encode("utf-8"), "encoded_sequence.dna", "text/plain")
             else:
@@ -470,7 +475,7 @@ def render_panel_5_decoding() -> None:
                 c2.metric("File extension", magic.get("kind", "unknown"))
                 c3.metric("File size", fmt_bytes(restore.get("size_bytes")))
 
-                preview_file(restore.get("preview_path"), "Decoded preview")
+                preview_file(restore.get("preview_path"), "Restored preview")
 
                 file_path = restore.get("file_path")
                 if file_path and os.path.exists(file_path):
