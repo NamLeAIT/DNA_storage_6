@@ -22,7 +22,7 @@ def render_app() -> None:
     st.markdown(
         """
 <div class="pipeline-box">
-<b>New pipeline:</b> Upload → Compression → Encoding → DNA strands preparation → Decoding → Analysis.<br>
+<b>Pipeline:</b> Upload → Compression → Encoding → DNA strands preparation → Decoding → Analysis.<br>
 </div>
 """,
         unsafe_allow_html=True,
