@@ -470,7 +470,7 @@ def render_panel_5_decoding() -> None:
                 c2.metric("File extension", magic.get("kind", "unknown"))
                 c3.metric("File size", fmt_bytes(restore.get("size_bytes")))
 
-                preview_file(restore.get("preview_path"), "Restored preview")
+                preview_file(restore.get("preview_path"), "Decoded preview")
 
                 file_path = restore.get("file_path")
                 if file_path and os.path.exists(file_path):
