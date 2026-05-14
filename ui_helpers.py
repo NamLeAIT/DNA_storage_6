@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import os
 import uuid
+import hashlib
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
@@ -98,6 +99,12 @@ def get_domain(path: str, data: bytes) -> str:
         return "text"
     return "other"
 
+def _stable_widget_key(prefix: str, *parts: object) -> str:
+    """Create a stable unique Streamlit widget key from file/path/context."""
+    raw = "|".join(str(x) for x in parts if x is not None)
+    digest = hashlib.md5(raw.encode("utf-8", errors="ignore")).hexdigest()[:12]
+    return f"{prefix}_{digest}"
+
 def preview_file(path: Optional[str], title: str = "Preview") -> None:
     st.markdown(f"#### {title}")
     if not path or not os.path.exists(path):
@@ -123,7 +130,13 @@ def preview_file(path: Optional[str], title: str = "Preview") -> None:
             st.video(path)
         elif kind == "text" or ext in {".txt", ".md", ".json", ".csv", ".tsv", ".log", ".xml", ".yaml", ".yml", ".html", ".py", ".js"}:
             text = Path(path).read_text(encoding="utf-8", errors="ignore")
-            st.text_area("Text preview", value=text[:15000], height=TEXT_PREVIEW_HEIGHT, label_visibility="collapsed")
+            st.text_area(
+                "Text preview",
+                value=text[:15000],
+                height=TEXT_PREVIEW_HEIGHT,
+                label_visibility="collapsed",
+                key=_stable_widget_key("text_preview", title, path, size, kind),
+            )
         elif kind == "pdf" or ext == ".pdf":
             st.info("PDF inline preview is not shown. Use download to inspect.")
         else:
@@ -132,4 +145,11 @@ def preview_file(path: Optional[str], title: str = "Preview") -> None:
         st.warning(f"Preview failed: {e}")
 
 def download_bytes_button(label: str, data: bytes, file_name: str, mime: str = "application/octet-stream") -> None:
-    st.download_button(label, data=data, file_name=file_name, mime=mime, use_container_width=True)
+    st.download_button(
+        label,
+        data=data,
+        file_name=file_name,
+        mime=mime,
+        use_container_width=True,
+        key=_stable_widget_key("download", label, file_name, mime, len(data) if data is not None else 0),
+    )
